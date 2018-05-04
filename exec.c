@@ -126,7 +126,6 @@ void redirection(struct cmd* cmd){
     }
     if(strlen(execcmd->err_file) > 0){
     	//Condicion para redireccionar el error estandar a la salida estandar '&>'
-    	printf("%s\n", execcmd->err_file);
     	if(execcmd->err_file[0] == '&'){
     		newEfd = dup2(STDOUT_FILENO,STDERR_FILENO);
     	}
@@ -144,10 +143,11 @@ void redirection(struct cmd* cmd){
 	}else{
 		if(ofd > 0){
 			if(newEfd > 0){
-				newOfd = dup2(ofd,newEfd);
-			}else{
-				newOfd = dup2(ofd,STDOUT_FILENO);	
-			}			
+				//Si redireccione el error estandar a la salida estandar anteriormente
+				//Debo redireccionar ese resultado de la salida estandar al archivo
+				newEfd = dup2(ofd,STDERR_FILENO);
+			}
+			newOfd = dup2(ofd,STDOUT_FILENO);			
 			close(ofd);
 		}
 		if(ifd > 0){
